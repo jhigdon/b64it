@@ -1,0 +1,9 @@
+
+body {
+    {{range .FileInfos}}
+    .bro-{{.FileName}} {
+        background-image: url('{{.Encoding}}')
+    }
+
+    {{end}}
+}
