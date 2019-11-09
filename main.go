@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -26,12 +27,31 @@ var (
 	inFile   *string
 	outDir   *string
 	showHelp *bool
+	inURL    *string
 )
 
 func init() {
-	inFile = flag.String("file", "", "file to consume")
+	inFile = flag.String("file", "", "file to consume expects image tags")
+	inURL = flag.String("url", "", "url to consume expects image tags")
 	outDir = flag.String("outdir", "./", "directory to output")
 	showHelp = flag.Bool("help", false, "show all feature flags")
+}
+
+func findMojis(url string) {
+	resp, err := http.Get(url)
+
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(string(body))
+
 }
 
 func getResultAs(url *string) (base64 string, err error) {
@@ -100,9 +120,7 @@ func main() {
 		return
 	}
 
-	if *inFile == "" {
-		panic("input file required")
-	} else {
+	if *inFile != "" {
 		// fmt.Println(*inFile)
 		files, _ := processFile(inFile)
 
@@ -134,7 +152,10 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+	}
 
+	if *inURL != "" {
+		findMojis(*inURL)
 	}
 
 }
