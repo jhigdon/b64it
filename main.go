@@ -37,7 +37,8 @@ func init() {
 	showHelp = flag.Bool("help", false, "show all feature flags")
 }
 
-func findMojis(url string) {
+// findMojis takes a url
+func findMoji(url string) []byte {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -50,10 +51,12 @@ func findMojis(url string) {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(string(body))
+	//fmt.Println(string(body))
+	return body
 
 }
 
+//getResultAs take url, return base64 encoding
 func getResultAs(url *string) (base64 string, err error) {
 	resp, err := http.Get(*url)
 
@@ -121,26 +124,18 @@ func main() {
 	}
 
 	if *inFile != "" {
-		// fmt.Println(*inFile)
+		fmt.Println(*inFile)
 		files, _ := processFile(inFile)
 
+		fmt.Println("begin getting results")
 		for i, file := range files {
 			files[i].Encoding, _ = getResultAs(&file.Uri)
-			fmt.Println(i)
+			//fmt.Println(i)
 		}
-		// files := []FileInfo{
-		// 	FileInfo{
-		// 		FileName: "turd",
-		// 		Encoding: "encodelol",
-		// 	},
-		// 	FileInfo{
-		// 		FileName: "moo",
-		// 		Encoding: "wat",
-		// 	},
-		// }
 
-		tmpl := template.Must(template.ParseFiles("./asset.css.tmpl"))
-		f, err := os.Create("out.scss")
+		fmt.Println("start template output")
+		tmpl := template.Must(template.ParseFiles("./asset.json.tmpl"))
+		f, err := os.Create("out.json")
 		if err != nil {
 			panic(err)
 		}
@@ -155,7 +150,7 @@ func main() {
 	}
 
 	if *inURL != "" {
-		findMojis(*inURL)
+		findMoji(*inURL)
 	}
 
 }
